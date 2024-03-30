@@ -16,6 +16,7 @@ sudo apk add font-terminus font-inconsolata font-dejavu font-noto font-noto-cjk 
 ```
 sudo apk add oh-my-zsh
 sudo git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k`
+```
 
 ## Configs
 copy the content of `config` to `~/.config` and the `vimrc` and `zshrc` to `~/.vimrc` / `~/.zshrc`
