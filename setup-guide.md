@@ -20,3 +20,11 @@ sudo git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUST
 
 ## Configs
 copy the content of `config` to `~/.config` and the `vimrc` and `zshrc` to `~/.vimrc` / `~/.zshrc`
+
+## Compile of RetroArch
+
+```
+apk add linux-headers mesa-dev qt5-qtbase-dev wayland-dev wayland-protocols zlib-dev alsa-lib-dev pulseaudio-dev sdl2-dev flac-dev mbedtls-dev libusb-dev openssl-dev>3 ffmpeg-dev libxkbcommon-dev eudev-dev vulkan-loader-dev
+git clone https://github.com/libretro/RetroArch -b v1.18.0 
+CFLAGS='-march=native' ./configure  --disable-videocore --disable-opengl1 --enable-opengles --enable-opengles3 --enable-opengles3_1 --enable-pulse --enable-udev --enable-ssl --enable-vulkan --enable-kms --enable-egl --enable-dispmanx
+```
