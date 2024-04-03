@@ -78,8 +78,8 @@ mode "sway" {
 
   # launchers
   bindsym Return        mode "default" ; exec $term
-  #bindsym d		mode "default" ; exec $launch
-  bindsym d exec $menu
+  bindsym d		mode "default" ; exec $launch
+  #bindsym d exec $menu
   bindsym Shift+d       mode "default" ; exec $floatterm
   
   # window management and navigation
@@ -159,6 +159,7 @@ bindsym Print                 exec $screenshot
 
 # start terminal at launch
 # exec $term
+exec swaylock --indicator --clock --effect-blur 7x5 -i /home/krim/.config/sway/wallpaper.png
 exec waybar
 exec nm-applet --indicator
 exec --no-startup-id udiskie &
