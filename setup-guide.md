@@ -4,12 +4,12 @@ This guide assumes you have a working Alpine Linux setup with the Sway window ma
 
 ## Additional Packages
 
-Install the following packages for fonts, utilities, and Waybar dependencies:
+Install the following packages for fonts, utilities, and Waybar dependencies. Its possible i missed a few:
 
 ```
 sudo apk add font-terminus font-inconsolata font-dejavu font-noto font-noto-cjk font-awesome font-noto-extra \
         autotiling zoxide py3-pip blueman brightnessctl waybar network-manager-applet curl zsh gawk \
-        grim slurp feh clipman vim udiskie 
+        grim slurp feh clipman vim udiskie swaylock-effects swayidle swaybg
 ```
 
 ## Oh My ZSH 
