@@ -2,5 +2,5 @@
 swayidle \
     timeout 1 'swaymsg "output * dpms off"' \
     resume 'swaymsg "output * dpms on"' &
-swaylock -c000000
+swaylock --indicator --clock --effect-blur 7x5 -S
 kill %%
