@@ -1,6 +1,6 @@
 # My Clockwork uConsole Config Files
 
-This repository contains my personal configuration files for Waybar, Sway and Foot, used for the Clockwork uConsole on Alpine Linux. These are based on multiple sources, tutorials and references from everywhere DDG could lead me, but relies heavily on **https://github.com/emdash/uConsole_sway_config**, so please check his repo for further details.
+This repository contains my personal configuration files for Waybar, Sway and Foot, used for the Clockwork uConsole on Alpine Linux via PostmarketOS. These are based on multiple sources, tutorials and references from everywhere DDG could lead me, but relies heavily on **https://github.com/emdash/uConsole_sway_config**, so please check his repo for further details.
 
 ## ⚠️ For Reference Only
 
@@ -20,3 +20,5 @@ Instructions for reproducing my Clockwork uConsole setup on Alpine Linux can be 
 ---
 
 Feel free to explore the code and adapt it for your own setup. Happy hacking! 🚀
+
+![Screenshot](screenshot.png "Screenshot")
