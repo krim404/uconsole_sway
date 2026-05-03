@@ -150,3 +150,4 @@ sudo ln -sf mount.exfat-fuse /sbin/mount.exfat
 - HDMI auto-mirror not active. swayfx 0.5.3 / sway 1.11.0 has no `output mirror` subcommand.
 - `for_window` rules use `[app_id=...]` only; the `[class=...]` selector is unavailable.
 - Audio default-sink follows HDMI hotplug via `/usr/local/bin/audio-hotswitch`.
+- `~/.zprofile` sources `/etc/profile.d/*.sh` before `exec sway`, so XDG_DATA_DIRS injections (Flatpak exports under `/var/lib/flatpak/exports/share`) reach the Wayland session and Flatpak apps appear in fuzzel.
