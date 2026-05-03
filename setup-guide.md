@@ -15,6 +15,7 @@ sudo apt install -y \
   bibata-cursor-theme libnotify-bin \
   xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
   zsh git curl gawk vim zoxide \
+  geany geany-plugins \
   pipewire pipewire-pulse wireplumber \
   imagemagick nodejs npm \
   exfat-fuse exfatprogs \
@@ -148,6 +149,38 @@ sudo loginctl enable-linger "$USER"
 systemctl --user daemon-reload
 systemctl --user enable --now meshtastic-notifyd.service
 systemctl --user status meshtastic-notifyd.service
+```
+
+## 7b. Geany as default editor for code and text mimetypes
+
+```bash
+DESKTOP=geany.desktop
+MIMES=(
+  text/plain
+  text/x-c text/x-c++ text/x-chdr text/x-csrc text/x-c++hdr text/x-c++src
+  text/x-csharp text/x-java text/x-javascript application/javascript
+  application/x-javascript text/javascript
+  application/json application/x-json text/x-json
+  application/xml text/xml text/html application/xhtml+xml
+  text/css text/x-scss text/x-sass text/x-less
+  text/x-python application/x-python text/x-python3
+  text/x-go text/rust text/x-rust text/x-ruby text/x-perl application/x-perl
+  text/x-php application/x-php application/x-httpd-php
+  application/x-httpd-php3 application/x-httpd-php4 application/x-httpd-php5
+  application/sql text/x-sql
+  text/x-shellscript application/x-shellscript application/x-sh
+  text/x-pascal text/x-dsrc text/x-makefile text/x-cmake
+  text/markdown text/x-markdown
+  application/yaml application/x-yaml text/yaml text/x-yaml
+  application/toml text/x-toml application/x-toml
+  text/x-ini text/x-properties text/x-diff text/x-patch text/x-log
+  text/x-vala text/x-haskell text/x-erlang text/x-lua
+  text/x-tex text/x-asm
+  text/csv text/tab-separated-values
+  application/x-desktop text/x-dockerfile
+  text/x-typescript application/typescript text/vnd.trolltech.linguist
+)
+for m in "${MIMES[@]}"; do xdg-mime default "$DESKTOP" "$m"; done
 ```
 
 ## 8. First start
