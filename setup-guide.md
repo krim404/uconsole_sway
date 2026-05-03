@@ -7,23 +7,30 @@ Target: Raspberry Pi 5 / CM5 uConsole running Debian Trixie 13 (aarch64). User a
 ```bash
 sudo apt update
 sudo apt install -y \
-  swaybg swayidle waybar foot fuzzel mako-notifier \
+  swaybg swayidle waybar foot fuzzel mako-notifier rofi \
   grim slurp clipman feh udiskie blueman \
   brightnessctl autotiling network-manager-gnome \
   fonts-terminus fonts-inconsolata fonts-dejavu fonts-noto fonts-noto-cjk \
   fonts-noto-color-emoji fonts-noto-extra fonts-font-awesome \
+  bibata-cursor-theme libnotify-bin \
+  xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
   zsh git curl gawk vim zoxide \
   pipewire pipewire-pulse wireplumber \
   imagemagick nodejs npm \
   exfat-fuse exfatprogs \
+  python3-meshtastic \
   build-essential meson pkg-config cmake scdoc hwdata \
   wayland-protocols libwayland-dev libpcre2-dev libjson-c-dev \
   libpango1.0-dev libcairo2-dev libgdk-pixbuf-2.0-dev \
   libdrm-dev libgbm-dev libinput-dev libseat-dev libxkbcommon-dev \
   libxcb-dri3-dev libxcb-present-dev libxcb-res0-dev \
   libxcb-render-util0-dev libxcb-ewmh-dev libxcb-icccm4-dev \
+  libxcb-composite0-dev libxcb-render0-dev libxcb-shm0-dev \
+  libxcb-xinput-dev libxcb-xfixes0-dev libxcb-image0-dev \
   libliftoff-dev libdisplay-info-dev liblcms2-dev libpixman-1-dev \
   libgles2-mesa-dev libpam0g-dev \
+  xwayland xserver-xorg-dev libxfixes-dev libxext-dev libxcursor-dev \
+  libxi-dev libxkbfile-dev xtrans-dev libxshmfence-dev \
   retroarch \
   libretro-snes9x libretro-mgba libretro-genesisplusgx libretro-nestopia \
   libretro-gambatte libretro-desmume libretro-bsnes-mercury-balanced \
@@ -53,6 +60,7 @@ Verifications:
 ```bash
 sway --version                                          # swayfx version 0.5.3 ... (based on sway 1.11.0)
 pkg-config --variable=have_drm_backend wlroots-0.19     # true
+pkg-config --variable=have_xwayland    wlroots-0.19     # true
 ```
 
 If `have_drm_backend` is `false`, wipe the partial install and rebuild with `hwdata` present:

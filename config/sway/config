@@ -4,10 +4,13 @@
 
 # ---- variables ----
 set $term       foot
-set $menu       fuzzel
+set $menu       fuzzel --launch-prefix='/usr/local/bin/app-launch'
 set $floatterm  exec foot --app-id=launcher
 set $launch     $floatterm fuzzel
 set $screenshot grim
+
+# ---- cursor theme with wait/spinner glyphs ----
+seat * xcursor_theme Bibata-Modern-Classic 24
 
 # emergency exit
 bindsym Control+Escape exec swaymsg exit

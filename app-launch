@@ -1,0 +1,8 @@
+#!/bin/bash
+# Mako-Notification beim App-Start.
+
+[ $# -lt 1 ] && exit 1
+
+APP="${1##*/}"
+notify-send -t 3000 -i system-run "$APP startet…" >/dev/null 2>&1
+setsid -f "$@" >/dev/null 2>&1
