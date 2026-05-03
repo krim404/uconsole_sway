@@ -118,17 +118,36 @@ sudo ln -sf "$PWD/ES-DE_aarch64.AppImage" /usr/local/bin/es-de
 ## 7. Deploy configs
 
 ```bash
-mkdir -p ~/.config/{sway,waybar,foot,fuzzel,mako}
-cp -r config/sway/*    ~/.config/sway/
-cp -r config/waybar/*  ~/.config/waybar/
-cp -r config/foot/*    ~/.config/foot/
-cp -r config/fuzzel/*  ~/.config/fuzzel/
-cp -r config/mako/*    ~/.config/mako/
+mkdir -p ~/.config/{sway,waybar,foot,fuzzel,mako,systemd/user}
+cp -r config/sway/*           ~/.config/sway/
+cp -r config/waybar/*         ~/.config/waybar/
+cp -r config/foot/*           ~/.config/foot/
+cp -r config/fuzzel/*         ~/.config/fuzzel/
+cp -r config/mako/*           ~/.config/mako/
+cp config/systemd/user/*      ~/.config/systemd/user/
 cp vimrc      ~/.vimrc
 cp zshrc      ~/.zshrc
 cp zprofile   ~/.zprofile
 
 sudo install -m 0755 -o root -g root audio-hotswitch /usr/local/bin/audio-hotswitch
+
+mkdir -p ~/.local/bin
+install -m 0755 meshtastic-notifyd ~/.local/bin/meshtastic-notifyd
+```
+
+## 7a. Meshtastic notification daemon
+
+Pushes a persistent mako notification (urgency=critical) plus a freedesktop sound
+on incoming text messages, logs everything to `~/.local/share/meshtastic/messages.db`.
+Connects to `meshtasticd` on `localhost:4403`. Steps aside automatically when another
+client (e.g. `gtk-meshtastic-client`) connects to the daemon — `meshtasticd` only allows
+one PhoneAPI client at a time.
+
+```bash
+sudo loginctl enable-linger "$USER"
+systemctl --user daemon-reload
+systemctl --user enable --now meshtastic-notifyd.service
+systemctl --user status meshtastic-notifyd.service
 ```
 
 ## 8. First start

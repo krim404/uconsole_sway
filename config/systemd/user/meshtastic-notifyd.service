@@ -1,0 +1,14 @@
+[Unit]
+Description=Meshtastic notification daemon
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/meshtastic-notifyd
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

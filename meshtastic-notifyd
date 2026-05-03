@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+# Meshtastic Notification-Daemon: notify-send (persistent) + Sound + SQLite-Log.
+
+import datetime
+import signal
+import sqlite3
+import subprocess
+import sys
+import threading
+import time
+from pathlib import Path
+
+import meshtastic.tcp_interface
+from pubsub import pub
+
+HOST = "localhost"
+PORT = 4403
+SOUND = "/usr/share/sounds/freedesktop/stereo/message-new-instant.oga"
+ICON = "/usr/share/icons/meshtastic.png"
+DB_PATH = Path.home() / ".local/share/meshtastic/messages.db"
+
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+DB = sqlite3.connect(DB_PATH, isolation_level=None, check_same_thread=False)
+DB.execute("""
+    CREATE TABLE IF NOT EXISTS messages (
+        ts        TEXT NOT NULL,
+        from_id   TEXT,
+        from_name TEXT,
+        channel   INTEGER,
+        text      TEXT NOT NULL,
+        UNIQUE(ts, from_id, text)
+    )
+""")
+
+iface = None
+disconnected = threading.Event()
+
+
+def on_connection_lost(interface):  # noqa: ARG001
+    disconnected.set()
+
+
+def established_4403_count() -> int:
+    out = subprocess.run(
+        ["ss", "-tnH", "state", "established", f"( sport = :{PORT} )"],
+        capture_output=True, text=True, timeout=2,
+    )
+    return len([l for l in out.stdout.splitlines() if l.strip()])
+
+
+def notify(short: str, channel: int, text: str) -> None:
+    subprocess.Popen(
+        ["notify-send", "-u", "critical", "-a", "Meshtastic", "-i", ICON,
+         f"{short} (#{channel})", text],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    subprocess.Popen(
+        ["paplay", SOUND],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+
+
+def on_text(packet, interface):
+    decoded = packet.get("decoded", {}) or {}
+    text = decoded.get("text") or decoded.get("payload")
+    if not text:
+        return
+    sender = packet.get("fromId") or "?"
+    short = sender
+    nodes = getattr(interface, "nodes", None) or {}
+    node = nodes.get(sender) or {}
+    user = node.get("user") or {}
+    short = user.get("shortName") or sender
+    channel = packet.get("channel", 0)
+    ts = datetime.datetime.now().isoformat(timespec="seconds")
+    try:
+        DB.execute(
+            "INSERT OR IGNORE INTO messages VALUES (?, ?, ?, ?, ?)",
+            (ts, sender, short, channel, text),
+        )
+    except sqlite3.Error as e:
+        print(f"sqlite: {e}", file=sys.stderr)
+    notify(short, channel, text)
+
+
+def shutdown(*_):
+    global iface
+    if iface:
+        try:
+            iface.close()
+        except Exception:
+            pass
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, shutdown)
+signal.signal(signal.SIGINT, shutdown)
+
+pub.subscribe(on_text, "meshtastic.receive.text")
+pub.subscribe(on_connection_lost, "meshtastic.connection.lost")
+
+while True:
+    while established_4403_count() > 0:
+        time.sleep(2)
+    disconnected.clear()
+    try:
+        iface = meshtastic.tcp_interface.TCPInterface(hostname=HOST, portNumber=PORT)
+        print("connected to meshtasticd", file=sys.stderr, flush=True)
+        # Hold connection. Re-check every 2s:
+        # - count == 1: only us on :4403, all good
+        # - count == 0: we were silently kicked or the daemon died -> reconnect loop
+        # - count >  1: another client connected -> step aside politely
+        # - disconnected event: library reported lost connection
+        while not disconnected.wait(timeout=2):
+            count = established_4403_count()
+            if count == 1:
+                continue
+            if count == 0:
+                print("our connection vanished, will reconnect", file=sys.stderr, flush=True)
+            else:
+                print("another client connected, stepping aside", file=sys.stderr, flush=True)
+            break
+    except Exception as e:
+        print(f"connect failed: {e}", file=sys.stderr, flush=True)
+    finally:
+        try:
+            if iface:
+                iface.close()
+        except Exception:
+            pass
+        iface = None
+    time.sleep(1)
