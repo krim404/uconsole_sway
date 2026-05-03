@@ -12,7 +12,7 @@ My personal Wayland setup for the Clockwork uConsole running **Debian Trixie** o
 | fuzzel                | Application launcher (replaces wofi)         |
 | mako                  | Notification daemon                          |
 | swaylock-effects      | Screen lock with blur                        |
-| swayidle              | Idle handling: lock, DPMS off, suspend       |
+| swayidle              | Idle handling: lock, backlight off           |
 | autotiling            | Automatic split direction                    |
 | pipewire + wireplumber| Audio (handles HDMI hotplug natively)        |
 | audio-hotswitch       | Auto-switch default sink to HDMI when present|

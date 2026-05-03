@@ -126,7 +126,7 @@ bindsym XF86AudioRaiseVolume  exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
 bindsym XF86AudioLowerVolume  exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 bindsym XF86AudioMute         exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
 bindsym XF86PowerOff          exec sudo poweroff
-bindsym Pause                 exec swaymsg "output * power toggle"
+bindsym Pause                 exec sh -c 'if [ "$(brightnessctl get)" -gt 0 ]; then sudo brightnessctl -s set 0; else sudo brightnessctl -r; fi'
 bindsym Print                 exec $screenshot
 
 # ---- autostart ----
@@ -142,8 +142,8 @@ exec_always autotiling
 exec /usr/local/bin/audio-hotswitch
 exec swayidle -w \
     timeout 300 'swaylock -f --indicator --clock --effect-blur 7x5 -i /home/krim/.config/sway/wallpaper.jpg' \
-    timeout 600 'swaymsg "output * power off"' \
-    resume 'swaymsg "output * power on"' \
+    timeout 600 'sudo brightnessctl -s set 0' \
+    resume 'sudo brightnessctl -r' \
     before-sleep 'swaylock -f --indicator --clock --effect-blur 7x5 -i /home/krim/.config/sway/wallpaper.jpg'
 
 xwayland enable
