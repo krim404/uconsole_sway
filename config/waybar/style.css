@@ -1,17 +1,17 @@
 * {
-  /* `otf-font-awesome` is required to be installed for icons */
-  font-family: "Noto Sans CJK KR Regular";
+  font-family: "Noto Sans CJK KR", "FontAwesome", monospace;
   font-size: 13px;
   min-height: 0;
+  border: none;
+  border-radius: 0;
 }
 
 window#waybar {
-  background-color: rgba(0, 0, 0, 0.6);
-  border-bottom: 2px solid black;
-  /*    border-bottom: 3px solid rgba(100, 114, 125, 0.5); */
-  color: #ffffff;
+  background-color: rgba(29, 32, 33, 0.85);
+  color: #ebdbb2;
+  border-bottom: 2px solid #3c3836;
   transition-property: background-color;
-  transition-duration: .5s;
+  transition-duration: .3s;
 }
 
 window#waybar.hidden {
@@ -19,58 +19,53 @@ window#waybar.hidden {
 }
 
 #waybar.empty #window {
-  background-color: transparent; 
-}
-
-#workspaces {
+  background-color: transparent;
 }
 
 #window {
-  margin: 2;
-  padding-left: 8;
-  padding-right: 8;
-  background-color: rgba(0,0,0,0.3);
-  font-size:14px;
+  margin: 2px;
+  padding: 0 8px;
+  background-color: rgba(60, 56, 54, 0.6);
+  color: #ebdbb2;
   font-weight: bold;
+  border-radius: 6px;
 }
 
 button {
-  /* Use box-shadow instead of border so the text isn't offset */
   box-shadow: inset 0 -3px transparent;
-  /* Avoid rounded borders under each button name */
   border: none;
   border-radius: 0;
 }
 
-/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 button:hover {
   background: inherit;
-  border-top: 2px solid #c9545d;
+  border-top: 2px solid #fabd2f;
 }
 
 #workspaces button {
-  padding: 0 4px;
-  color: #ffffff;
-  /*    background-color: rgba(0,0,0,0.3); */
-}
-
-#workspaces button:hover {
+  padding: 0 6px;
+  color: #a89984;
+  background-color: transparent;
 }
 
 #workspaces button.focused {
-  /*    box-shadow: inset 0 -2px #c9545d; */
-  background-color: rgba(0,0,0,0.3);
-  color:#c9545d;
-  border-bottom: 2px solid #c9545d;
+  color: #fabd2f;
+  background-color: rgba(60, 56, 54, 0.8);
+  border-bottom: 2px solid #fabd2f;
 }
 
 #workspaces button.urgent {
-  background-color: #eb4d4b;
+  background-color: #cc241d;
+  color: #fbf1c7;
 }
 
 #mode {
-  background-color: #64727D;
-  border-bottom: 3px solid #ffffff;
+  background-color: #fabd2f;
+  color: #282828;
+  font-weight: bold;
+  padding: 0 8px;
+  border-radius: 6px;
+  margin: 2px;
 }
 
 #clock,
@@ -83,85 +78,113 @@ button:hover {
 #network,
 #pulseaudio,
 #wireplumber,
-#custom-media,
 #tray,
-#mode,
 #idle_inhibitor,
 #scratchpad,
-#mpd {
-  margin: 2px;
-  padding-left: 4px;
-  padding-right: 4px;
-  background-color: rgba(0,0,0,0.3);
-  color: #ffffff;
+#keyboard-state,
+#mpd,
+#taskbar {
+  margin: 2px 1px;
+  padding: 0 8px;
+  background-color: rgba(60, 56, 54, 0.6);
+  color: #ebdbb2;
+  border-radius: 6px;
 }
 
-/* If workspaces is the leftmost module, omit left margin */
+#taskbar button {
+  padding: 0 4px;
+  margin: 0 2px;
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+#taskbar button.active {
+  background-color: rgba(250, 189, 47, 0.2);
+  border-bottom: 2px solid #fabd2f;
+}
+
+#taskbar button:hover {
+  background-color: rgba(250, 189, 47, 0.1);
+}
+
 .modules-left > widget:first-child > #workspaces {
   margin-left: 0;
 }
 
-/* If workspaces is the rightmost module, omit right margin */
 .modules-right > widget:last-child > #workspaces {
   margin-right: 0;
 }
 
 #clock {
-  font-size:14px;
+  color: #fabd2f;
   font-weight: bold;
 }
 
-#battery icon {
-  color: red;
+#cpu {
+  color: #b8bb26;
 }
 
-#battery.charging, #battery.plugged {
-  color: #ffffff;
-  background-color: #26A65B;
+#memory {
+  color: #83a598;
+}
+
+#temperature {
+  color: #fe8019;
+}
+
+#temperature.critical {
+  background-color: #cc241d;
+  color: #fbf1c7;
+}
+
+#network {
+  color: #8ec07c;
+}
+
+#network.disconnected {
+  background-color: #cc241d;
+  color: #fbf1c7;
+}
+
+#pulseaudio {
+  color: #d3869b;
+}
+
+#battery {
+  color: #b8bb26;
+}
+
+#battery.charging,
+#battery.plugged {
+  color: #fbf1c7;
+  background-color: #98971a;
 }
 
 @keyframes blink {
   to {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #fbf1c7;
+    color: #282828;
   }
 }
 
 #battery.warning:not(.charging) {
-  background-color: #f53c3c;
-  color: #ffffff;
-  animation-name: blink;
-  animation-duration: 0.5s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
+  background-color: #d79921;
+  color: #282828;
 }
 
 #battery.critical:not(.charging) {
-  background-color: #f53c3c;
-  color: #ffffff;
+  background-color: #cc241d;
+  color: #fbf1c7;
   animation-name: blink;
-  animation-duration: 0.5s;
+  animation-duration: 0.6s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   animation-direction: alternate;
 }
 
-label:focus {
-  background-color: #000000;
-}
-
-#network.disconnected {
-  background-color: #f53c3c;
-}
-
-#temperature.critical {
-  background-color: #eb4d4b;
-}
-
 #idle_inhibitor.activated {
-  background-color: #ecf0f1;
-  color: #2d3436;
+  background-color: #fabd2f;
+  color: #282828;
 }
 
 #tray > .passive {
@@ -170,21 +193,5 @@ label:focus {
 
 #tray > .needs-attention {
   -gtk-icon-effect: highlight;
-  background-color: #eb4d4b;
+  background-color: #cc241d;
 }
-
-/*
-
-window#waybar.solo {
-background-color: #FFFFFF;
-}
-
-window#waybar.termite {
-background-color: #3F3F3F;
-}
-
-window#waybar.chromium {
-background-color: #000000;
-border: none;
-}
- */

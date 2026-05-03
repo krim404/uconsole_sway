@@ -1,24 +1,44 @@
-# My Clockwork uConsole Config Files
+# Clockwork uConsole - Sway Setup
 
-This repository contains my personal configuration files for Waybar, Sway and Foot, used for the Clockwork uConsole on Alpine Linux via PostmarketOS. These are based on multiple sources, tutorials and references from everywhere DDG could lead me, but relies heavily on **https://github.com/emdash/uConsole_sway_config**, so please check his repo for further details.
+My personal Wayland setup for the Clockwork uConsole running **Debian Trixie** on a **Raspberry Pi 5 / CM5** module. Window manager: **swayfx** (sway with blur, rounded corners, shadows). Theme: **Gruvbox Dark**.
 
-## ⚠️ For Reference Only
+## Components
 
-These config files are provided as a reference and are not intended to work out-of-the-box. They require specific setup and dependencies. Only use these if you know what you're doing!
+| Tool                  | Purpose                                      |
+|-----------------------|----------------------------------------------|
+| swayfx 0.5.3          | Tiling Wayland compositor with eye candy    |
+| waybar                | Status bar (Gruvbox-themed)                  |
+| foot                  | Terminal emulator (Gruvbox-themed)           |
+| fuzzel                | Application launcher (replaces wofi)         |
+| mako                  | Notification daemon                          |
+| swaylock-effects      | Screen lock with blur                        |
+| swayidle              | Idle handling: lock, DPMS off, suspend       |
+| autotiling            | Automatic split direction                    |
+| pipewire + wireplumber| Audio (handles HDMI hotplug natively)        |
+| audio-hotswitch       | Auto-switch default sink to HDMI when present|
+| RetroArch + cores     | Emulators (libretro)                         |
+| ES-DE                 | EmulationStation Desktop Edition frontend    |
 
-## 📂 Config Files
+## Files
 
-- `waybar/config` - Waybar configuration
-- `waybar/style.css` - Waybar styling 
-- `sway/config` - Sway window manager configuration
-- `foot/foot.ini` - Foot terminal emulator settings
+- `config/sway/`    - sway config + wallpaper
+- `config/waybar/`  - waybar config + Gruvbox CSS
+- `config/foot/`    - foot terminal config (Gruvbox colors)
+- `config/fuzzel/`  - launcher theme
+- `config/mako/`    - notification theme
+- `audio-hotswitch` - shell script, deployed to `/usr/local/bin/`
+- `vimrc`, `zshrc`  - dot files (oh-my-zsh + powerlevel10k)
 
-## 🏔️ Alpine Linux Setup
+## Hardware specifics (Pi 5 uConsole)
 
-Instructions for reproducing my Clockwork uConsole setup on Alpine Linux can be found in the [setup-guide.md](setup-guide.md).
+- DSI panel on `DSI-2`, native portrait 720x1280, rotated to landscape via `transform 90`.
+- Keyboard USB ID `1eaf:0024`, keymap handled by the OS.
+- Audio via pipewire-pulse; default sink follows HDMI hotplug via `audio-hotswitch`.
+- exFAT support is FUSE-based via `mount.exfat-fuse` symlinked as `mount.exfat` (setup-guide.md §9).
+- No HDMI display mirror.
 
----
+## Setup
 
-Feel free to explore the code and adapt it for your own setup. Happy hacking! 🚀
+See [setup-guide.md](setup-guide.md) for installation steps.
 
-![Screenshot](screenshot.png "Screenshot")
+![Screenshot](screenshot.png)

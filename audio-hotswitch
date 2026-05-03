@@ -1,0 +1,25 @@
+#!/bin/bash
+# Setzt Default-Audio-Sink: HDMI wenn vorhanden, sonst erste verfügbare Nicht-Monitor-Sink.
+# Wird von Sway als User exec'd, terminiert mit der Session.
+
+set_best_sink() {
+  local hdmi
+  hdmi=$(pactl list short sinks | awk '$2 ~ /hdmi/ {print $2; exit}')
+  if [ -n "$hdmi" ]; then
+    pactl set-default-sink "$hdmi"
+    return
+  fi
+  local fallback
+  fallback=$(pactl list short sinks | awk '$2 !~ /monitor/ {print $2; exit}')
+  [ -n "$fallback" ] && pactl set-default-sink "$fallback"
+}
+
+set_best_sink
+
+pactl subscribe | while read -r line; do
+  case "$line" in
+    *"sink"*"new"*|*"sink"*"remove"*)
+      set_best_sink
+      ;;
+  esac
+done
