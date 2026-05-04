@@ -7,7 +7,7 @@ Target: Raspberry Pi 5 / CM5 uConsole running Debian Trixie 13 (aarch64). User a
 ```bash
 sudo apt update
 sudo apt install -y \
-  swaybg swayidle waybar foot fuzzel mako-notifier rofi \
+  swaybg swayidle swaylock waybar foot fuzzel mako-notifier rofi \
   grim slurp clipman feh udiskie blueman \
   brightnessctl autotiling network-manager-gnome \
   fonts-terminus fonts-inconsolata fonts-dejavu fonts-noto fonts-noto-cjk \
@@ -18,7 +18,7 @@ sudo apt install -y \
   geany geany-plugins \
   pipewire pipewire-pulse wireplumber \
   imagemagick nodejs npm \
-  exfat-fuse exfatprogs \
+  exfatprogs \
   python3-meshtastic \
   build-essential meson pkg-config cmake scdoc hwdata \
   wayland-protocols libwayland-dev libpcre2-dev libjson-c-dev \
@@ -80,16 +80,24 @@ sudo ninja -C ~/build/swayfx/build/ install
 sudo ldconfig
 ```
 
-## 3. swaylock-effects from source
+## 3. Screen lock
+
+Mainline `swaylock` is sufficient. swaylock-effects (the source-built fork with blur) does **not** work with swayfx / wlroots 0.19 - it relies on the deprecated `wlr_input_inhibitor` protocol that has been removed. Use the package from §1, which speaks the modern `ext-session-lock-v1`.
 
 ```bash
-cd ~/build
-git clone --depth 1 https://github.com/mortie/swaylock-effects.git
-cd swaylock-effects
-meson build/
-ninja -C build/
-sudo ninja -C build/ install
+# already in §1 apt list, just confirm:
+which swaylock         # /usr/bin/swaylock
+swaylock --version     # 1.8.x
+ls /etc/pam.d/swaylock # ships with the package, do not overwrite
 ```
+
+The blur effect is faked by feeding swaylock a pre-blurred copy of the wallpaper:
+
+```bash
+convert ~/.config/sway/wallpaper.jpg -blur 0x8 ~/.config/sway/wallpaper-blurred.jpg
+```
+
+The shipped `lock-screen` wrapper (§7) calls `swaylock` with that image, drops the backlight, and restores it via an inside-lock `swayidle` loop so the keypress prompt is visible while typing.
 
 ## 4. oh-my-zsh + powerlevel10k
 
@@ -131,6 +139,7 @@ cp zshrc      ~/.zshrc
 cp zprofile   ~/.zprofile
 
 sudo install -m 0755 -o root -g root audio-hotswitch /usr/local/bin/audio-hotswitch
+sudo install -m 0755 -o root -g root lock-screen      /usr/local/bin/lock-screen
 
 mkdir -p ~/.local/bin
 install -m 0755 meshtastic-notifyd ~/.local/bin/meshtastic-notifyd
@@ -189,12 +198,112 @@ Boot the device. The TTY shows a normal getty login. Enter your password. `~/.zp
 
 On first zsh start you will be prompted for `p10k configure` to set up the powerlevel10k prompt.
 
-## 9. exFAT mount helper
+## 9. Encrypted `/home` with fscrypt
+
+Per-directory transparent encryption of the user's home, key wrapped with their login passphrase. No second prompt at login, no separate partition, no LUKS in initramfs. The DSI panel on Pi5/CM5 stays black during the initramfs phase, so a cryptsetup-style prompt would not be readable there - this approach sidesteps that entirely.
+
+Set the target user once for all snippets in this section:
 
 ```bash
-sudo ln -sf mount.exfat-fuse /usr/sbin/mount.exfat
-sudo ln -sf mount.exfat-fuse /sbin/mount.exfat
+ACCOUNT=krim   # change to your login account
+HOME_DIR=/home/$ACCOUNT
 ```
+
+### 9.1 Prerequisites
+
+Root filesystem must be ext4 with the `encrypt` feature. Trixie's `mkfs.ext4` sets it; verify and turn it on online if missing:
+
+```bash
+ROOT_DEV=$(findmnt -no SOURCE /)
+sudo tune2fs -l "$ROOT_DEV" | grep -q encrypt || sudo tune2fs -O encrypt "$ROOT_DEV"
+```
+
+### 9.2 Install
+
+```bash
+sudo apt install -y fscrypt libpam-fscrypt
+sudo fscrypt setup --quiet         # global config
+sudo fscrypt setup --quiet /       # filesystem-level metadata
+```
+
+`libpam-fscrypt` auto-wires into PAM via `pam-auth-update`. Verify:
+
+```bash
+grep -h fscrypt /etc/pam.d/common-{auth,password,session}
+# auth     optional    pam_fscrypt.so
+# password optional    pam_fscrypt.so
+# session  optional    pam_fscrypt.so
+```
+
+### 9.3 Encrypt the home directory before the user's first regular login
+
+Only an empty directory can be encrypted. Two paths depending on whether `$HOME_DIR` already has real data.
+
+**A) Fresh setup (no real data in `$HOME_DIR` yet):**
+
+```bash
+sudo passwd "$ACCOUNT"                       # set/confirm login passphrase first
+sudo rm -rf "$HOME_DIR"
+sudo install -d -m 700 -o "$ACCOUNT" -g "$ACCOUNT" "$HOME_DIR"
+
+sudo fscrypt encrypt "$HOME_DIR" --user="$ACCOUNT" --source=pam_passphrase --no-recovery
+# Prompts once for the account's login passphrase.
+
+sudo cp -a /etc/skel/. "$HOME_DIR/"
+sudo chown -R "$ACCOUNT":"$ACCOUNT" "$HOME_DIR"
+```
+
+**B) Existing system with data in `$HOME_DIR` (rename, encrypt new, rsync):**
+
+```bash
+sudo mv "$HOME_DIR" "${HOME_DIR}.old"
+sudo install -d -m 700 -o "$ACCOUNT" -g "$ACCOUNT" "$HOME_DIR"
+sudo fscrypt encrypt "$HOME_DIR" --user="$ACCOUNT" --source=pam_passphrase --no-recovery
+sudo rsync -aHAX "${HOME_DIR}.old/" "$HOME_DIR/"
+# Verify with a fresh login (logout, log back in), then:
+sudo rm -rf "${HOME_DIR}.old"
+```
+
+### 9.4 Verify
+
+```bash
+sudo fscrypt status "$HOME_DIR"
+# "Unlocked: Yes" right after a fresh login of $ACCOUNT
+# "Unlocked: No"  once that account's last session ends
+```
+
+`pam_fscrypt` derives the key from the login passphrase. Reboot, log in normally, the home becomes readable; on logout / reboot it becomes opaque again (root sees only ciphertext filename stubs, file contents are inaccessible).
+
+## 10. Persistent SD-card auto-mount (no sway required)
+
+The second SD card slot (exposed via the carrier's USB bridge as `/dev/sda`) mounts at boot via `/etc/fstab`, independent of any desktop-session auto-mounter. `nofail` keeps boot snappy if the card is missing.
+
+Trixie's kernel has native exFAT support (`exfat.ko`); only `exfatprogs` is needed for `mkfs.exfat` / `fsck.exfat`. The `exfat-fuse` package is optional and only relevant for older kernels - if it is installed, it ships `mount.exfat → mount.exfat-fuse` symlinks that force every `mount -t exfat` through FUSE. Remove those symlinks (or purge `exfat-fuse`) to use the kernel driver:
+
+```bash
+sudo apt install -y exfatprogs
+sudo apt purge -y exfat-fuse 2>/dev/null || true
+sudo rm -f /sbin/mount.exfat /usr/sbin/mount.exfat   # leftover symlinks if any
+```
+
+Identify the data partition (commonly `/dev/sda2` for an exFAT card with a leading EFI/MBR partition) and add a fstab entry. `uid/gid` give the owning account write access:
+
+```bash
+SD_PART=/dev/sda2
+SD_UUID=$(sudo blkid -s UUID -o value "$SD_PART")
+ACCOUNT_UID=$(id -u "$ACCOUNT")
+ACCOUNT_GID=$(id -g "$ACCOUNT")
+
+sudo mkdir -p /mnt/sdcard
+echo "UUID=$SD_UUID  /mnt/sdcard  exfat  defaults,nofail,uid=$ACCOUNT_UID,gid=$ACCOUNT_GID,umask=0022,x-systemd.device-timeout=5  0  0" \
+  | sudo tee -a /etc/fstab
+
+sudo systemctl daemon-reload
+sudo mount -a
+mount | grep /mnt/sdcard      # should show "type exfat", not "fuseblk"
+```
+
+The card mounts at `/mnt/sdcard` early during boot, before any user logs in. udisks2 inside a sway session sees it as already mounted and leaves it alone.
 
 ## Notes
 

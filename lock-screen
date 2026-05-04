@@ -1,0 +1,70 @@
+#!/bin/sh
+# Lock the screen with swaylock and put the backlight to sleep, but bring it
+# back on whenever the user touches a key (so the unlock prompt is visible
+# while typing). Re-dim after 10s of inactivity. Restore the saved brightness
+# once the unlock succeeds.
+#
+# Run as the foreground command of a sway "exec" binding; sway forks it off so
+# blocking here is harmless.
+#
+# Implementation note: swayidle's resume hook does NOT fire while sway is in
+# the ext-session-lock state, so we listen on /dev/input directly. The user
+# must be in the "input" group for that to work.
+
+WALLPAPER="${HOME}/.config/sway/wallpaper-blurred.jpg"
+DIM_AFTER=5
+
+# Pick the first keyboard event device. by-id paths are stable across reboots.
+KBD=
+for d in /dev/input/by-id/*-event-kbd; do
+    [ -r "$d" ] || continue
+    KBD="$d"
+    break
+done
+
+# Save current brightness so brightnessctl -r at the end restores it.
+sudo brightnessctl -s get >/dev/null
+
+# Lock the session. swaylock without -f blocks until the user enters the
+# correct passphrase.
+swaylock -i "$WALLPAPER" &
+LOCK_PID=$!
+
+# Give swaylock a moment to grab the session-lock surface so the first frame
+# is the blurred wallpaper, not a flicker of bare desktop.
+sleep 1
+sudo brightnessctl set 0
+
+# Inside-lock backlight loop.
+# - block (up to $DIM_AFTER s) for one input event from the keyboard
+# - any event => raise brightness back to its saved level (only if currently dim)
+# - timeout  => set brightness to 0 (only if currently lit)
+# Edge-triggering avoids re-applying the same value on every keystroke,
+# which causes the panel to flicker on this hardware.
+# Loop ends when the locker dies (LOCK_PID gone).
+if [ -n "$KBD" ]; then
+    (
+        dim=1   # we just turned the backlight off above
+        while kill -0 "$LOCK_PID" 2>/dev/null; do
+            if timeout "$DIM_AFTER" head -c 24 "$KBD" >/dev/null 2>&1; then
+                if [ "$dim" = 1 ]; then
+                    sudo brightnessctl -r >/dev/null
+                    dim=0
+                fi
+            else
+                if [ "$dim" = 0 ]; then
+                    sudo brightnessctl set 0 >/dev/null
+                    dim=1
+                fi
+            fi
+        done
+    ) &
+    DIMMER_PID=$!
+fi
+
+# Block until the user unlocks.
+wait "$LOCK_PID"
+
+# Tear down the dimmer loop and restore the saved brightness.
+[ -n "${DIMMER_PID:-}" ] && kill "$DIMMER_PID" 2>/dev/null
+sudo brightnessctl -r
