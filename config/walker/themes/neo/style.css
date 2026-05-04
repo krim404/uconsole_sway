@@ -1,0 +1,187 @@
+@define-color accent_bg_color #d79921; @define-color accent_bg_color2 #fabd2f; @define-color theme_fg_color #ebdbb2; @define-color subtle_fg_color #bdae93; @define-color error_bg_color #cc241d; @define-color error_fg_color #1d2021;
+
+/* Global reset */
+* {
+  all: unset;
+}
+
+.normal-icons {
+  -gtk-icon-size: 16px;
+}
+
+.large-icons {
+  -gtk-icon-size: 50px;
+}
+
+scrollbar {
+  opacity: 0;
+}
+
+/* ================= Left column - avatar and search ================= */
+
+.left-background {
+  background: url("../images/avatar.png");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-left: 15px;
+}
+
+.left-column {
+  border-radius: 22px;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 10, 0.20),
+    rgba(8, 8, 10, 0.40)
+  );
+}
+
+/* Search bar */
+.search-container {
+  background: rgba(18, 18, 22, 0.80);
+  border-radius: 999px;
+  padding: 10px 16px;
+  margin: 15px;
+  color: @theme_fg_color;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.search-icon {
+  color: @subtle_fg_color;
+}
+
+.input placeholder {
+  opacity: 0.5;
+  color: @subtle_fg_color;
+}
+
+.input selection {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+
+/* Mode buttons (APPS / RUN / FILES / WINDOW) */
+.mode-button {
+  min-width: 20px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: rgba(20, 20, 26, 0.9);
+  color: @subtle_fg_color;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+}
+
+.mode-buttons {
+  margin: 15px;
+}
+
+.mode-button:hover {
+  background: rgba(35, 35, 45, 0.96);
+  color: @theme_fg_color;
+  cursor: pointer;
+}
+
+.mode-apps {
+  background: linear-gradient(135deg, @accent_bg_color, @accent_bg_color2);
+  color: #1c1c1f;
+}
+
+.mode-apps:hover {
+  background: linear-gradient(135deg, @accent_bg_color2, @accent_bg_color);
+  color: #1c1c1f;
+}
+
+/* ================= Right column - results list ================= */
+
+.content-container {
+  background: rgba(15, 15, 20, 0.86);
+  border-radius: 22px;
+  padding: 18px 18px 16px 18px;
+}
+
+.list {
+  color: @theme_fg_color;
+}
+
+/* Result rows */
+.item-box {
+  border-radius: 14px;
+  padding: 10px 14px;
+  transition: background 90ms ease-out, transform 90ms ease-out;
+}
+
+child:selected .item-box {
+  background: linear-gradient(
+    135deg,
+    rgba(80, 80, 96, 0.55),
+    rgba(40, 40, 70, 0.55)
+  );
+  transform: translateY(-1px);
+}
+
+.item-subtext {
+  font-size: 11px;
+  opacity: 0.6;
+  color: @subtle_fg_color;
+}
+
+/* ================= Placeholder and error messages ================= */
+
+.placeholder {
+  color: @subtle_fg_color;
+  font-size: 12px;
+  padding-top: 4px;
+}
+
+.error {
+  padding: 8px 10px;
+  margin-top: 4px;
+  background: @error_bg_color;
+  color: @error_fg_color;
+  border-radius: 8px;
+}
+
+/* ================= Keybinds footer ================= */
+
+.keybinds {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  color: @subtle_fg_color;
+}
+
+.keybind-label {
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid @accent_bg_color2;
+}
+
+/* ================= Preview ================= */
+
+/* Contenedor principal de la preview (GtkBox con clase .preview-box) */
+.preview-box {
+  color: @theme_fg_color;
+}
+
+/* Área donde se dibuja el contenido de la preview */
+.preview {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  color: @theme_fg_color;
+}
+
+/* Iconos grandes dentro de la preview */
+.preview .large-icons {
+  -gtk-icon-size: 64px;
+}
+
+/* Ejemplo de estilo específico para cierto contenido de preview
+   (equivalente a lo que hace default con archlinuxpkgs). */
+.preview-content.archlinuxpkgs {
+  font-family: monospace;
+}

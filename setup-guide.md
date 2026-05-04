@@ -7,7 +7,7 @@ Target: Raspberry Pi 5 / CM5 uConsole running Debian Trixie 13 (aarch64). User a
 ```bash
 sudo apt update
 sudo apt install -y \
-  swaybg swayidle swaylock waybar foot fuzzel mako-notifier rofi \
+  swaybg swayidle swaylock waybar foot mako-notifier rofi \
   grim slurp clipman feh udiskie blueman \
   brightnessctl autotiling network-manager-gnome \
   fonts-terminus fonts-inconsolata fonts-dejavu fonts-noto fonts-noto-cjk \
@@ -99,6 +99,25 @@ convert ~/.config/sway/wallpaper.jpg -blur 0x8 ~/.config/sway/wallpaper-blurred.
 
 The shipped `lock-screen` wrapper (§7) calls `swaylock` with that image, drops the backlight, and listens on the keyboard event device (requires the user to be in the `input` group) to bring the backlight back when the user starts typing and dim it again after 5s of inactivity.
 
+## 3a. Walker launcher (replaces fuzzel)
+
+Walker is a GTK4 launcher with a separate `elephant` provider daemon. The shipped neo theme is Gruvbox-coloured with a sidebar avatar, pill-shaped search and a `>CMD =CALC /FILE` prefix hint row. Bound to `Super_R, d` in the sway config.
+
+The build is non-trivial (Rust + GTK4, ~30 min on a CM5, plus elephant + 9 provider plugins). All of that is wrapped in `install-walker.sh` at the repo root:
+
+```bash
+bash install-walker.sh
+```
+
+The script:
+- `apt install`s build deps (`rustup`, GTK4-dev, gtk4-layer-shell-dev, protobuf, poppler, golang-go, make) and the runtime helpers `qalc` (calc provider) and `fd-find` (files provider, plus a `fd → fdfind` symlink in `/usr/local/bin`)
+- runs `rustup toolchain install stable` (Trixie's apt rustc 1.85 is too old; current walker needs 1.88+)
+- clones and builds `elephant` (Go), installs to `/usr/local/bin/elephant`
+- builds the provider plugins (`desktopapplications`, `files`, `calc`, `websearch`, `runner`, `clipboard`, `symbols`, `bookmarks`, `providerlist`) as Go `.so` plugins into `/usr/local/lib/elephant/`
+- clones and builds `walker` (Rust + GTK4), installs to `/usr/local/bin/walker`
+
+Config + theme are deployed in §7 to `~/.config/walker/`.
+
 ## 4. oh-my-zsh + powerlevel10k
 
 ```bash
@@ -127,12 +146,12 @@ sudo ln -sf "$PWD/ES-DE_aarch64.AppImage" /usr/local/bin/es-de
 ## 7. Deploy configs
 
 ```bash
-mkdir -p ~/.config/{sway,waybar,foot,fuzzel,mako,systemd/user}
+mkdir -p ~/.config/{sway,waybar,foot,mako,walker,systemd/user}
 cp -r config/sway/*           ~/.config/sway/
 cp -r config/waybar/*         ~/.config/waybar/
 cp -r config/foot/*           ~/.config/foot/
-cp -r config/fuzzel/*         ~/.config/fuzzel/
 cp -r config/mako/*           ~/.config/mako/
+cp -r config/walker/*         ~/.config/walker/
 cp config/systemd/user/*      ~/.config/systemd/user/
 cp vimrc      ~/.vimrc
 cp zshrc      ~/.zshrc

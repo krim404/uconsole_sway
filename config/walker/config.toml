@@ -1,0 +1,50 @@
+theme = "neo"
+close_when_open = true
+click_to_close = true
+single_click_activation = true
+selection_wrap = false
+hide_quick_activation = false
+
+[shell]
+anchor_top = true
+anchor_bottom = true
+anchor_left = true
+anchor_right = true
+
+[providers]
+# Prefix-less: query goes to all of these in parallel.
+default = [
+  "desktopapplications",
+  "files",
+  "calc",
+  "websearch",
+  "runner",
+]
+# Empty input: only show installed apps.
+empty = ["desktopapplications"]
+max_results = 50
+
+# Single-character prefixes scope the query to one provider.
+[[providers.prefixes]]
+prefix = "="
+provider = "calc"
+
+[[providers.prefixes]]
+prefix = "/"
+provider = "files"
+
+[[providers.prefixes]]
+prefix = ":"
+provider = "clipboard"
+
+[[providers.prefixes]]
+prefix = ">"
+provider = "runner"
+
+[[providers.prefixes]]
+prefix = "."
+provider = "symbols"
+
+[[providers.prefixes]]
+prefix = ";"
+provider = "providerlist"

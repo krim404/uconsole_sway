@@ -9,7 +9,7 @@ My personal Wayland setup for the Clockwork uConsole running **Debian Trixie** o
 | swayfx 0.5.3          | Tiling Wayland compositor with eye candy    |
 | waybar                | Status bar (Gruvbox-themed)                  |
 | foot                  | Terminal emulator (Gruvbox-themed)           |
-| fuzzel                | Application launcher (replaces wofi)         |
+| walker + elephant     | GTK4 launcher with provider plugins (apps, files, calc, runner, ...) |
 | mako                  | Notification daemon                          |
 | swaylock              | Screen lock (mainline; effects-fork breaks on swayfx)|
 | swayidle              | Idle handling: lock, backlight off           |
@@ -25,10 +25,11 @@ My personal Wayland setup for the Clockwork uConsole running **Debian Trixie** o
 - `config/sway/`    - sway config + wallpaper
 - `config/waybar/`  - waybar config + Gruvbox CSS
 - `config/foot/`    - foot terminal config (Gruvbox colors)
-- `config/fuzzel/`  - launcher theme
+- `config/walker/`  - launcher config + neo theme (Gruvbox glass card)
 - `config/mako/`    - notification theme
 - `audio-hotswitch` - shell script, deployed to `/usr/local/bin/`
 - `lock-screen`     - swaylock wrapper with pre-blur + auto-dim (deployed to `/usr/local/bin/`)
+- `install-walker.sh` - one-shot build+install for walker + elephant + provider plugins
 - `vimrc`, `zshrc`  - dot files (oh-my-zsh + powerlevel10k)
 
 ## Hardware specifics (Pi 5 uConsole)
