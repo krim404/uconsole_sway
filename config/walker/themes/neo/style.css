@@ -17,15 +17,7 @@ scrollbar {
   opacity: 0;
 }
 
-/* ================= Left column - avatar and search ================= */
-
-.left-background {
-  background: url("../images/avatar.png");
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-  margin-left: 15px;
-}
+/* ================= Left column - search ================= */
 
 .left-column {
   border-radius: 22px;

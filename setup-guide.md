@@ -101,7 +101,7 @@ The shipped `lock-screen` wrapper (§7) calls `swaylock` with that image, drops 
 
 ## 3a. Walker launcher (replaces fuzzel)
 
-Walker is a GTK4 launcher with a separate `elephant` provider daemon. The shipped neo theme is Gruvbox-coloured with a sidebar avatar, pill-shaped search and a `>CMD =CALC /FILE` prefix hint row. Bound to `Super_R, d` in the sway config.
+Walker is a GTK4 launcher with a separate `elephant` provider daemon. The shipped neo theme is Gruvbox-coloured with pill-shaped search and a `>CMD =CALC /FILE` prefix hint row. Bound to `Super_R, d` in the sway config.
 
 The build is non-trivial (Rust + GTK4, ~30 min on a CM5, plus elephant + 9 provider plugins). All of that is wrapped in `install-walker.sh` at the repo root:
 
