@@ -91,13 +91,13 @@ swaylock --version     # 1.8.x
 ls /etc/pam.d/swaylock # ships with the package, do not overwrite
 ```
 
-The blur effect is faked by feeding swaylock a pre-blurred copy of the wallpaper:
+The blur effect is faked by feeding swaylock a pre-blurred copy of the wallpaper. A pre-blurred file is shipped in `config/sway/wallpaper-blurred.jpg` and is deployed alongside the rest of the sway config in §7. To regenerate it for a different wallpaper:
 
 ```bash
 convert ~/.config/sway/wallpaper.jpg -blur 0x8 ~/.config/sway/wallpaper-blurred.jpg
 ```
 
-The shipped `lock-screen` wrapper (§7) calls `swaylock` with that image, drops the backlight, and restores it via an inside-lock `swayidle` loop so the keypress prompt is visible while typing.
+The shipped `lock-screen` wrapper (§7) calls `swaylock` with that image, drops the backlight, and listens on the keyboard event device (requires the user to be in the `input` group) to bring the backlight back when the user starts typing and dim it again after 5s of inactivity.
 
 ## 4. oh-my-zsh + powerlevel10k
 
